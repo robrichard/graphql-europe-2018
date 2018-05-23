@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>My Awesome Presentation</title>
+    <title>Data Masking in GraphQL Clients</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <style type="text/css">
 
@@ -50,11 +50,19 @@
         font-weight: 400;
       }
 
-      .remark-slide-content h1 {
-        font-size: 48px;        
+      .remark-slide-content h1, h1 .remark-inline-code {
+        font-size: 48px !important;        
       }
 
-      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .remark-slide-content h2 {
+        font-size: 36px !important;        
+      }
+
+      .remark-slide-content h3 {
+        font-size: 28px;        
+      }
+
+      .remark-code, .remark-inline-code { font-family: courier; font-size: 16px; }
     </style>
   </head>
   <body>
@@ -64,7 +72,8 @@ class: center, middle
 
 # Data Masking in GraphQL Clients
 
-### Rob Richard
+## Rob Richard
+### GraphQL Europe 2018
 
 ???
 
@@ -81,7 +90,41 @@ Notes for the _first_ slide!
 [NOTE]: Note that you need active internet connection to access remark.js script file
 ---
 
-# Introduction
+
+# Relay API `<QueryRenderer/>`
+
+```js
+const MyComponent => (
+  <QueryRenderer
+    query={graphql`
+      query MyComponentQuery($personId: ID!) {
+        person(id: $personId) {
+          id
+          height
+          species {
+            id
+            name
+          }
+        }
+      }
+    `}
+    variables={{personId: "cGVvcGxlOjM="}}
+    render=(({error, props}) => {
+      if (!props) {
+        return <div>Loading</div>;
+      }
+      return (
+        <div>
+          <h1>{props.person.name}</h1>
+          <div>height: {props.person.height}</div>
+          <div>species: {props.person.species.name}</div>
+        </div>
+      );
+    })
+  />
+);
+
+```
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
