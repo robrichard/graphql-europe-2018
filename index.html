@@ -323,7 +323,7 @@ fragment PersonComponent_person on Person {
 ???
 * From this flattened store object, an ID reference, and the fragment, you could create a function that returns the correct data for a component.
 * Only the correct fields will be returned even if additional data will be fetched. 
-* This is what 
+* This is what `createFragmentContainer` does internally.
 
 ---
 # Why data masking?
@@ -331,6 +331,9 @@ fragment PersonComponent_person on Person {
 * If this field is no longer used in this component you can have complete confidence that it can be removed from the query without understanding the whole codebase.
 * Helps you ensure you are not over fetching.
 * Especially useful when you have a team working on the same codebase.
+
+???
+* I think this is an underrated feature of Relay
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
     </script>
