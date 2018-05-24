@@ -51,15 +51,20 @@
       }
 
       .remark-slide-content h1, h1 .remark-inline-code {
-        font-size: 48px !important;        
+        font-size: 38px !important;        
       }
 
       .remark-slide-content h2 {
-        font-size: 36px !important;        
+        font-size: 32px !important;        
       }
 
       .remark-slide-content h3 {
-        font-size: 28px;        
+        font-size: 26px;        
+      }
+
+      .remark-slide-content li {
+        font-size: 32px;   
+        line-height: 1.6;     
       }
 
       .remark-code, .remark-inline-code { font-family: courier; font-size: 16px; }
@@ -75,25 +80,11 @@ class: center, middle
 ## Rob Richard
 ### GraphQL Europe 2018
 
-???
-
-Notes for the _first_ slide!
-
 ---
-
-# Agenda
-
-1. Introduction
-2. Deep-dive
-3. ...
-
-[NOTE]: Note that you need active internet connection to access remark.js script file
----
-
 
 # Relay API `<QueryRenderer/>`
 
-```js
+```jsx
 const MyComponent => (
   <QueryRenderer
     query={graphql`
@@ -101,7 +92,7 @@ const MyComponent => (
         person(id: $personId) {
           id
           height
-          species {
+          homeworld {
             id
             name
           }
@@ -109,7 +100,7 @@ const MyComponent => (
       }
     `}
     variables={{personId: "cGVvcGxlOjM="}}
-    render=(({error, props}) => {
+    render={({props}) => {
       if (!props) {
         return <div>Loading</div>;
       }
@@ -117,20 +108,237 @@ const MyComponent => (
         <div>
           <h1>{props.person.name}</h1>
           <div>height: {props.person.height}</div>
-          <div>species: {props.person.species.name}</div>
+          <div>home world: {props.person.homeworld.name}</div>
         </div>
       );
-    })
+    }}
   />
 );
 
 ```
 
+???
+* QueryRenderer is a React Component provided by Relay
+* First prop is a GraphQL query
+* Second prop is the variables for that query
+* This component will execute this query against your GraphQL server
+* It has a `render` prop, which is called twice, first to render the loading state, and again with the response from your GraphQL server.
+
+---
+# `createFragmentContainer`
+
+```javascript
+const PersonComponent = ({person}) => (
+  <div>
+    <h1>{person.name}</h1>
+    <div>height: {person.height}</div>
+    <div>homeworld: {person.homeworld.name}</div>
+  </div>
+)
+
+export default createFragmentContainer(PersonComponent, {
+  person: graphql`
+    fragment PersonComponent_person on Person {
+      id
+      height
+      homeworld {
+        id
+        name
+      }
+    }
+  `
+})
+```
+
+???
+* `createFragmentContainer` creates a higher order component.
+* GraphQL fragments are coupled to the component.
+* This allows the component to define it's data depedency via the fragment 
+
+---
+# Updated `<QueryRenderer/>`
+
+```js
+const MyComponent => (
+  <QueryRenderer
+    query={graphql`
+      query MyComponentQuery($personId: ID!) {
+        person(id: $personId) {
+          ...PersonComponent_person
+        }
+      }
+    `}
+    variables={{personId: "cGVvcGxlOjM="}}
+    render={({props}) => {
+      if (!props) {
+        return <div>Loading</div>;
+      }
+      return <PersonComponent person={props.person} />;
+    }}
+  />
+);
+```
+
+???
+* We reference this fragment in the `QueryRenderer`'s query
+* We render this component in the `render` prop.
+* We can also consume fragment containers from other fragment containers.
+
+---
+# Why use `createFragmentContainer`?
+* Allows components to define their data requirements
+* Components are reusable
+* Data masking
+
+???
+* You could just write the whole query at the top of your app
+* Allows components to define their data requirements
+* * It's a declarative way to describe the data you need
+* Components are reusable
+* * You can drop the component you need into other places of your app without adjusting your data fetching
+
+---
+# What is data masking?
+
+* Data masking prevents components from accessing data they did not specifically request
+
+---
+# Data masking example
+
+
+```diff
+const PersonComponent = ({person}) => {
++ console.log(person.homeworld.name); // undefined!
+  return (
+    <div>
+      <h1>{person.name}</h1>
+      <div>height: {person.height}</div>
++     <HomeworldComponent homeworld={person.homeworld} />
+    </div>
+  );
+}
+
+export default createFragmentContainer(PersonComponent, {
+  person: graphql`
+    fragment PersonComponent_person on Person {
+      id
+      height
+      homeworld {
++       ...HomeworldComponent
+      }
+    }
+  `
+})
+
+```
+???
+* I've created a new HomeworldComponent and updated the PersonComponent to use it.
+* Notice that the PersonComponent does not have access to the data requested by the HomeworldComponent
+
+---
+# How is data masking implemented?
+
+* There's a two step process to render GraphQL data
+* * The network response is "flattened" into a store
+* * Data to be rendered is "selected" out of the store
+
+---
+# The network response is "flattened" into a store
+
+```json
+GraphQL Response
+{
+  "data": {
+    "person": {
+      "id": "cGVvcGxlOjM=",
+      "height": 96,
+      "name": "R2-D2",
+      "homeworld": {
+        "id": "cGxhbmV0czo4",
+        "name": "Naboo"
+      }
+    }
+  }
+}
+```
+⬇️
+```json
+Client Store
+{
+  "cGVvcGxlOjM=": {
+    "height": 96,
+    "name": "R2-D2",
+    "homeworld": {"__ref": "cGxhbmV0czo4"}
+  },
+  "cGxhbmV0czo4": {
+    "name": "Naboo"
+  }
+}
+```
+
+???
+* Each object returned by the graphql server is put into a "flattened" object.
+* The id returned by the graphql server is used as the key
+* Nested objects are referenced back into the store object by their ID by that __ref property
+
+---
+# Selecting data out of the store
+
+* A selector can be created from both
+* * The GraphQL fragment
+* * A reference to the right object
+
+
+---
+# Selecting data out of the store
+
+```
+Client Store
+{
+  "cGVvcGxlOjM=": {
+    "height": 96,
+    "name": "R2-D2",
+    "homeworld": {"__ref": "cGxhbmV0czo4"}
+  },
+  "cGxhbmV0czo4": {
+    "name": "Naboo"
+  }
+}
+➕
+ID "cGVvcGxlOjM"
+➕
+fragment PersonComponent_person on Person {
+  id
+  height
+}
+
+⬇️
+
+{
+  id: "cGVvcGxlOjM=",
+  height: 96,
+  name: "R2-D2",
+}
+```
+???
+* From this flattened store object, an ID reference, and the fragment, you could create a function that returns the correct data for a component.
+* Only the correct fields will be returned even if additional data will be fetched. 
+* This is what 
+
+---
+# Why data masking?
+* Why is this good? It prevents implicit data dependencies
+* If this field is no longer used in this component you can have complete confidence that it can be removed from the query without understanding the whole codebase.
+* Helps you ensure you are not over fetching.
+* Especially useful when you have a team working on the same codebase.
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
     </script>
     <script type="text/javascript">
-      var slideshow = remark.create();
+      var slideshow = remark.create({
+        // highlightLanguage: 'javascript',
+        highlightStyle: 'xcode'
+      });
     </script>
   </body>
 </html>
