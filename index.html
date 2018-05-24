@@ -82,6 +82,12 @@ class: center, middle
 
 ---
 
+# Data Masking in GraphQL Clients
+* Data masking is a unique feature supported in Relay
+* First a brief overview of the Relay API
+
+---
+
 # Relay API `<QueryRenderer/>`
 
 ```jsx
@@ -123,6 +129,7 @@ const MyComponent => (
 * Second prop is the variables for that query
 * This component will execute this query against your GraphQL server
 * It has a `render` prop, which is called twice, first to render the loading state, and again with the response from your GraphQL server.
+* This example is using a QueryRenderer to fetch and render all the data it needs.
 
 ---
 # `createFragmentContainer`
@@ -152,19 +159,20 @@ export default createFragmentContainer(PersonComponent, {
 
 ???
 * `createFragmentContainer` creates a higher order component.
-* GraphQL fragments are coupled to the component.
+* These components are used as children of a QueryRenderer
+* It provides a way to couple a GraphQL fragment to a component.
 * This allows the component to define it's data depedency via the fragment 
 
 ---
 # Updated `<QueryRenderer/>`
 
-```js
+```diff
 const MyComponent => (
   <QueryRenderer
     query={graphql`
       query MyComponentQuery($personId: ID!) {
         person(id: $personId) {
-          ...PersonComponent_person
++          ...PersonComponent_person
         }
       }
     `}
@@ -173,7 +181,7 @@ const MyComponent => (
       if (!props) {
         return <div>Loading</div>;
       }
-      return <PersonComponent person={props.person} />;
++      return <PersonComponent person={props.person} />;
     }}
   />
 );
@@ -196,6 +204,9 @@ const MyComponent => (
 * * It's a declarative way to describe the data you need
 * Components are reusable
 * * You can drop the component you need into other places of your app without adjusting your data fetching
+* * All you need to use this component is a reference to a Person object.
+* * If it's used in multiple places and you need more data, you only need to change this one file
+* * Provides data masking
 
 ---
 # What is data masking?
@@ -213,7 +224,7 @@ const PersonComponent = ({person}) => {
     <div>
       <h1>{person.name}</h1>
       <div>height: {person.height}</div>
-+     <HomeworldComponent homeworld={person.homeworld} />
++     <PlanetComponent planet={person.homeworld} />
     </div>
   );
 }
@@ -224,7 +235,7 @@ export default createFragmentContainer(PersonComponent, {
       id
       height
       homeworld {
-+       ...HomeworldComponent
++       ...PlanetComponent
       }
     }
   `
@@ -232,8 +243,11 @@ export default createFragmentContainer(PersonComponent, {
 
 ```
 ???
-* I've created a new HomeworldComponent and updated the PersonComponent to use it.
-* Notice that the PersonComponent does not have access to the data requested by the HomeworldComponent
+* I've created a new PlanetComponent and updated the PersonComponent to use it to render this person's homeworld.
+* * The PlanetComponent will have it's own fragment and request whatever data it needs
+* I have a console log in here to demostrate that the PersonComponent, even though it's a parent of the PlanetComponent, does not have access to the data requested by the PlanetComponent
+* PersonComponent is decoupled from PlanetComponent. It only knows that it needs to pass a planet object to it as a prop.
+* If PlanetComponent requirements change and it needs more planet data to render, no changes are required to the components that consume it.
 
 ---
 # How is data masking implemented?
@@ -278,7 +292,7 @@ Client Store
 
 ???
 * Each object returned by the graphql server is put into a "flattened" object.
-* The id returned by the graphql server is used as the key
+* The id returned by the graphql server is used as the key. If there were more objects in this response they would each be added as separate keys.
 * Nested objects are referenced back into the store object by their ID by that __ref property
 
 ---
@@ -324,6 +338,48 @@ fragment PersonComponent_person on Person {
 * From this flattened store object, an ID reference, and the fragment, you could create a function that returns the correct data for a component.
 * Only the correct fields will be returned even if additional data will be fetched. 
 * This is what `createFragmentContainer` does internally.
+* It's implemented by getting the selected fields from the AST of the graphql fragment, and a recursive function that can follow the references in the store.
+* If you've used react-redux, it's a lot like the connect function, except here it can be buit automatically by the fragment data.
+---
+# Selecting data out of the store
+
+```js
+export default createFragmentContainer(PersonComponent, {
+  person: graphql`
+    fragment PersonComponent_person on Person {
+      id
+      height
+    }
+  `
+});
+```
+```js
+<PersonComponent person={props.person} />
+```
+
+===
+```js
+function createFragmentContainer(Component, fragments) {
+  return function HOC(props) {
+    let componentProps = {};
+    for (const propName in fragments) {
+      componentProps[prop] = selectDataFromStore(
+        props[propName].id,
+        fragments[propName]
+      );
+    }
+
+    return <Component {...props} {...componentProps} />;
+  };
+}
+```
+
+???
+* At the top is how a fragment container is defined
+* Then how its used in the consuming component
+* At the bottom of this slide is a very simple implementation of createFragmentContainer
+* * For each fragment passed to `createFragmentContainer` we check for a prop with the same name passed in and select the correct data out of the store.
+* * The selected data is passed to the component, overriding the props from the parent.
 
 ---
 # Why data masking?
@@ -334,6 +390,10 @@ fragment PersonComponent_person on Person {
 
 ???
 * I think this is an underrated feature of Relay
+
+---
+# That's all
+
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js" type="text/javascript">
     </script>
