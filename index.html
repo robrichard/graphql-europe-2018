@@ -67,7 +67,75 @@
         line-height: 1.6;     
       }
 
-      .remark-code, .remark-inline-code { font-family: courier; font-size: 16px; }
+      .remark-code, .remark-inline-code {
+        font-family: courier;
+        font-size: 16px;
+      }
+
+      .flex {
+        display: flex;
+      }
+
+      .big {
+        margin: 0;
+      }
+
+      .bigCode .remark-code, .bigText .remark-inline-code {
+        font-size: 18px!important;
+      }
+
+      .column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .addition {
+        box-sizing: border-box;
+        border: 1px solid #ddd;
+        padding: 5px;
+        height: 100%;
+      }
+
+      .addition h3 {
+        margin: 0!important;
+      }
+
+      .addition pre {
+        margin: 0;
+      }
+
+      .column-arrow {
+        font-size: 35px!important;
+        flex: 1;
+        text-align: center;
+        vertical-align: middle;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+      }
+
+      .plus {
+        font-size: 60px!important;
+        font-weight: bold;
+        flex: 1;
+        text-align: center;
+        vertical-align: middle;
+        justify-content: center;
+        display: flex;
+        padding: 0px;
+        margin: 12px;
+      }
+      .equals {
+        font-size: 60px!important;
+        font-weight: bold;
+        flex: 1;
+        text-align: center;
+      }
+      .columnPlus {
+            margin-top: 67px;
+      }
     </style>
   </head>
   <body>
@@ -257,10 +325,14 @@ export default createFragmentContainer(PersonComponent, {
 * * Data to be rendered is "selected" out of the store
 
 ---
+
 # The network response is "flattened" into a store
 
+.flex[
+
+.column.bigCode[
+### GraphQL Response
 ```json
-GraphQL Response
 {
   "data": {
     "person": {
@@ -275,20 +347,31 @@ GraphQL Response
   }
 }
 ```
-⬇️
+]
+
+.column-arrow[
+➡️
+]
+
+.column.bigCode[
+### Client Store
 ```json
-Client Store
 {
   "cGVvcGxlOjM=": {
     "height": 96,
     "name": "R2-D2",
-    "homeworld": {"__ref": "cGxhbmV0czo4"}
+    "homeworld": {
+      "__ref": "cGxhbmV0czo4"
+    }
   },
   "cGxhbmV0czo4": {
     "name": "Naboo"
   }
 }
 ```
+]
+
+]
 
 ???
 * Each object returned by the graphql server is put into a "flattened" object.
@@ -306,34 +389,77 @@ Client Store
 ---
 # Selecting data out of the store
 
-```
-Client Store
+.big.flex[
+
+.column[
+.addition[
+### Client Store
+```json
 {
   "cGVvcGxlOjM=": {
     "height": 96,
     "name": "R2-D2",
-    "homeworld": {"__ref": "cGxhbmV0czo4"}
+    "homeworld": {
+      "__ref":
+        "cGxhbmV0czo4"
+    }
   },
   "cGxhbmV0czo4": {
     "name": "Naboo"
   }
 }
-➕
-ID "cGVvcGxlOjM"
-➕
-fragment PersonComponent_person on Person {
+```
+]
+]
+
+.column[
+.plus[+]
+]
+
+
+.column[
+.addition[
+### ID
+```json
+"cGVvcGxlOjM"
+```
+]
+]
+
+.column[
+.plus[+]
+]
+
+.column[
+.addition[
+### Fragment
+```graphql
+fragment on Person {
   id
   height
 }
+```
+]
+]
 
-⬇️
+]
 
+.big.flex[.equals[=]]
+.big.flex[
+.column[
+.addition[
+### Result
+
+```json
 {
   id: "cGVvcGxlOjM=",
   height: 96,
   name: "R2-D2",
 }
 ```
+]
+]
+]
 ???
 * From this flattened store object, an ID reference, and the fragment, you could create a function that returns the correct data for a component.
 * Only the correct fields will be returned even if additional data will be fetched. 
@@ -405,3 +531,4 @@ function createFragmentContainer(Component, fragments) {
     </script>
   </body>
 </html>
+  
