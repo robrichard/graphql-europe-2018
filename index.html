@@ -80,7 +80,7 @@
         margin: 0;
       }
 
-      .bigCode .remark-code, .bigText .remark-inline-code {
+      .bigCode .remark-code{
         font-size: 18px!important;
       }
 
@@ -93,17 +93,23 @@
 
       .addition {
         box-sizing: border-box;
-        border: 1px solid #ddd;
-        padding: 5px;
         height: 100%;
       }
+      .codeBorder {
+        border: 1px solid #ddd;
+        padding: 5px;
+      }
 
-      .addition h3 {
+      .codeBorder h3 {
         margin: 0!important;
       }
 
-      .addition pre {
+      .codeBorder pre {
         margin: 0;
+      }
+
+      .smallCode .remark-code {
+        font-size:12px!important;
       }
 
       .column-arrow {
@@ -134,7 +140,10 @@
         text-align: center;
       }
       .columnPlus {
-            margin-top: 67px;
+        margin-top: 67px;
+      }
+      .marginTop {
+        margin-top: 20px;
       }
     </style>
   </head>
@@ -321,8 +330,8 @@ export default createFragmentContainer(PersonComponent, {
 # How is data masking implemented?
 
 * There's a two step process to render GraphQL data
-* * The network response is "flattened" into a store
-* * Data to be rendered is "selected" out of the store
+* Step 1 - The network response is "flattened" into a store
+* Step 2 - Data to be rendered is "selected" out of the store
 
 ---
 
@@ -392,7 +401,7 @@ export default createFragmentContainer(PersonComponent, {
 .big.flex[
 
 .column[
-.addition[
+.addition.codeBorder[
 ### Client Store
 ```json
 {
@@ -418,7 +427,7 @@ export default createFragmentContainer(PersonComponent, {
 
 
 .column[
-.addition[
+.addition.codeBorder[
 ### ID
 ```json
 "cGVvcGxlOjM"
@@ -431,7 +440,7 @@ export default createFragmentContainer(PersonComponent, {
 ]
 
 .column[
-.addition[
+.addition.codeBorder[
 ### Fragment
 ```graphql
 fragment on Person {
@@ -443,11 +452,10 @@ fragment on Person {
 ]
 
 ]
-
 .big.flex[.equals[=]]
 .big.flex[
 .column[
-.addition[
+.addition.codeBorder[
 ### Result
 
 ```json
@@ -469,21 +477,8 @@ fragment on Person {
 ---
 # Selecting data out of the store
 
-```js
-export default createFragmentContainer(PersonComponent, {
-  person: graphql`
-    fragment PersonComponent_person on Person {
-      id
-      height
-    }
-  `
-});
-```
-```js
-<PersonComponent person={props.person} />
-```
-
-===
+.codeBorder[
+### Implementation
 ```js
 function createFragmentContainer(Component, fragments) {
   return function HOC(props) {
@@ -499,13 +494,32 @@ function createFragmentContainer(Component, fragments) {
   };
 }
 ```
+]
+
+.codeBorder.smallCode.marginTop[
+### Usage
+```js
+// create HOC
+export default createFragmentContainer(PersonComponent, {
+  person: graphql`
+    fragment PersonComponent_person on Person {
+      id
+      height
+    }
+  `
+});
+
+// render HOC
+<PersonComponent person={props.person} />
+```
+]
 
 ???
-* At the top is how a fragment container is defined
-* Then how its used in the consuming component
-* At the bottom of this slide is a very simple implementation of createFragmentContainer
+* At the top of this slide is a very simple implementation of createFragmentContainer
 * * For each fragment passed to `createFragmentContainer` we check for a prop with the same name passed in and select the correct data out of the store.
 * * The selected data is passed to the component, overriding the props from the parent.
+* At the bottom is how a fragment container is defined
+* Then how its used in the consuming component
 
 ---
 # Why data masking?
