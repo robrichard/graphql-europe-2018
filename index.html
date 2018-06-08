@@ -113,7 +113,7 @@
       }
 
       .column-arrow {
-        font-size: 35px!important;
+        font-size: 60px!important;
         flex: 1;
         text-align: center;
         vertical-align: middle;
@@ -182,7 +182,7 @@ const MyComponent => (
         }
       }
     `}
-    variables={{personId: "cGVvcGxlOjM="}}
+    variables={{personId: "xlOjM="}}
     render={({props}) => {
       if (!props) {
         return <div>Loading</div>;
@@ -253,7 +253,7 @@ const MyComponent => (
         }
       }
     `}
-    variables={{personId: "cGVvcGxlOjM="}}
+    variables={{personId: "xlOjM="}}
     render={({props}) => {
       if (!props) {
         return <div>Loading</div>;
@@ -345,11 +345,11 @@ export default createFragmentContainer(PersonComponent, {
 {
   "data": {
     "person": {
-      "id": "cGVvcGxlOjM=",
+      "id": "xlOjM=",
       "height": 96,
       "name": "R2-D2",
       "homeworld": {
-        "id": "cGxhbmV0czo4",
+        "id": "V0czo4",
         "name": "Naboo"
       }
     }
@@ -359,21 +359,21 @@ export default createFragmentContainer(PersonComponent, {
 ]
 
 .column-arrow[
-➡️
+→
 ]
 
 .column.bigCode[
 ### Client Store
 ```json
 {
-  "cGVvcGxlOjM=": {
+  "xlOjM=": {
     "height": 96,
     "name": "R2-D2",
     "homeworld": {
-      "__ref": "cGxhbmV0czo4"
+      "__ref": "V0czo4"
     }
   },
-  "cGxhbmV0czo4": {
+  "V0czo4": {
     "name": "Naboo"
   }
 }
@@ -405,15 +405,15 @@ export default createFragmentContainer(PersonComponent, {
 ### Client Store
 ```json
 {
-  "cGVvcGxlOjM=": {
+  "xlOjM=": {
     "height": 96,
     "name": "R2-D2",
     "homeworld": {
       "__ref":
-        "cGxhbmV0czo4"
+        "V0czo4"
     }
   },
-  "cGxhbmV0czo4": {
+  "V0czo4": {
     "name": "Naboo"
   }
 }
@@ -430,7 +430,7 @@ export default createFragmentContainer(PersonComponent, {
 .addition.codeBorder[
 ### ID
 ```json
-"cGVvcGxlOjM"
+"xlOjM"
 ```
 ]
 ]
@@ -446,6 +446,7 @@ export default createFragmentContainer(PersonComponent, {
 fragment on Person {
   id
   height
+  name
 }
 ```
 ]
@@ -460,7 +461,7 @@ fragment on Person {
 
 ```json
 {
-  id: "cGVvcGxlOjM=",
+  id: "xlOjM=",
   height: 96,
   name: "R2-D2",
 }
