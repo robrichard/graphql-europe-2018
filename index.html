@@ -205,7 +205,8 @@ const MyComponent => (
 * Second prop is the variables for that query
 * This component will execute this query against your GraphQL server
 * It has a `render` prop, which is called twice, first to render the loading state, and again with the response from your GraphQL server.
-* This example is using a QueryRenderer to fetch and render all the data it needs.
+* This example is using a QueryRenderer to fetch and render all the data it needs
+* These examples are using the Star Wars GraphQL API.
 
 ---
 # `createFragmentContainer`
@@ -264,6 +265,7 @@ const MyComponent => (
 ```
 
 ???
+* Now I've updated this QueryRenderer to use that fragment container.
 * We reference this fragment in the `QueryRenderer`'s query
 * We render this component in the `render` prop.
 * We can also consume fragment containers from other fragment containers.
@@ -275,10 +277,11 @@ const MyComponent => (
 * Data masking
 
 ???
+* Why use `createFragmentContainer`?
 * You could just write the whole query at the top of your app
-* Allows components to define their data requirements
+* A fragment container allows components to define their data requirements
 * * It's a declarative way to describe the data you need
-* Components are reusable
+* It also allows components to be more reusable
 * * You can drop the component you need into other places of your app without adjusting your data fetching
 * * All you need to use this component is a reference to a Person object.
 * * If it's used in multiple places and you need more data, you only need to change this one file
