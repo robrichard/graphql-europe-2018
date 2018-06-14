@@ -507,7 +507,7 @@ fragment on Person {
 * Only the correct fields will be returned even if additional data was be fetched. 
 * This is what `createFragmentContainer` does internally.
 * It's implemented by getting the selected fields from the graphql fragment, and a recursive function that can follow the references in the store.
-* If you've used react-redux, it's a lot like the `connect` function, except here it is generated automatically by the fragment data.
+* If you've used react-redux, it's a lot like the `connect` function. In redux you would write a function that would return the needed properties from your store. In Relay this can be generated automatically by the fragment data.
 ---
 # Selecting data out of the store
 
@@ -566,9 +566,8 @@ export default createFragmentContainer(PersonComponent, {
 * Why data masking? What's the point?
 * It prevents implicit data dependencies
 * Let's say you're refactoring a component and it no longer needs a field from your GraphQL server. You have complete confidence that it can be safely removed from the fragment without understanding the whole codebase.
-* Helps you ensure you are not over fetching.
-* * If you can't be sure if something is used, you're going to leave it there.
-* This is especially useful when you have a team working on the same codebase.
+* * This confidence is important. If you're not confident that removing something won't break anything, chances are you'll leave it in. If this happens a few times you could be accidentally overfetching and your app will not be as performant as it could be.
+* This is especially useful when it's a team of engineers working on a large codebase.
 
 ---
 # That's all!
@@ -576,9 +575,9 @@ export default createFragmentContainer(PersonComponent, {
 * github @robrichard
 
 ???
-* That's all I have, thanks for listening.
+* That's all I have.
 * Be sure to find me during the breaks if you want to chat more about this.
-* Thanks!
+* Thanks for listening!
 
 
     </textarea>
