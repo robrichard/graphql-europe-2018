@@ -166,9 +166,14 @@ class: center, middle
 ---
 
 # Data Masking in GraphQL Clients
-* 1stdibs Front-End stack: React, Relay, GraphQL
 * Data masking is a unique feature supported in Relay
 * First a brief overview of the Relay API
+
+???
+* Today I'm going to talk about Data Masking in GraphQL Clients
+* I know that Apollo tends to be a more popular choice when it comes to GraphQL Clients.
+* So I wanted to go more in depth on this feature that is unique to Relay
+* But first a quick overview of the Relay API
 
 ---
 
@@ -210,13 +215,14 @@ const MyComponent => (
 ```
 
 ???
-* QueryRenderer is a React Component provided by Relay
-* First prop is a GraphQL query
-* Second prop is the variables for that query
+
+* QueryRenderer is a React Component provided by Relay that takes in a few props.
+* Here's an example of the QueryRenderer using the Star Wars API.
+* The first prop is a GraphQL query
+* The second prop is the variables for that query
 * This component will execute this query against your GraphQL server
 * It has a `render` prop, which is called twice, first to render the loading state, and again with the response from your GraphQL server.
 * This example is using a QueryRenderer to fetch and render all the data it needs
-* These examples are using the Star Wars GraphQL API.
 
 ---
 # `createFragmentContainer`
@@ -245,7 +251,8 @@ export default createFragmentContainer(PersonComponent, {
 ```
 
 ???
-* `createFragmentContainer` creates a higher order component.
+* Up next we have `createFragmentContainer`.
+* `createFragmentContainer` is a function that creates a higher order component.
 * These components are used as children of a QueryRenderer
 * It provides a way to couple a GraphQL fragment to a component.
 * This allows the component to define it's data depedency via the fragment 
@@ -277,7 +284,7 @@ const MyComponent => (
 ???
 * Now I've updated this QueryRenderer to use that fragment container.
 * We reference this fragment in the `QueryRenderer`'s query
-* We render this component in the `render` prop.
+* And we render this component in the `render` prop.
 * We can also consume fragment containers from other fragment containers.
 
 ---
@@ -287,20 +294,22 @@ const MyComponent => (
 * Data masking
 
 ???
-* Why use `createFragmentContainer`?
-* You could just write the whole query at the top of your app
-* A fragment container allows components to define their data requirements
+* Why use `createFragmentContainer`? You could just write the whole query at the top of your app.
+* We use fragment containers because they allow individual components to define their data requirements
 * * It's a declarative way to describe the data you need
 * It also allows components to be more reusable
 * * You can drop the component you need into other places of your app without adjusting your data fetching
-* * All you need to use this component is a reference to a Person object.
-* * If it's used in multiple places and you need more data, you only need to change this one file
+* * All you need to use this component is a reference to a Person object. This component could render a `Person` type in multiple different contexts.
 * * Provides data masking
 
 ---
 # What is data masking?
 
 * Data masking prevents components from accessing data they did not specifically request
+
+???
+* Data masking prevents components from accessing data they did not specifically request
+* Let's look at an example
 
 ---
 # Data masking example
@@ -335,10 +344,18 @@ export default createFragmentContainer(PersonComponent, {
 * I've created a new PlanetComponent and updated the PersonComponent to use it to render this person's homeworld.
 * * The PlanetComponent will have it's own fragment and request whatever data it needs
 * I have a console log in here to demostrate that the PersonComponent, even though it's a parent of the PlanetComponent, does not have access to the data requested by the PlanetComponent
+* The data masking feature will prevent parent or sibling components from accessing fetched data that was not defined by their fragments.
 * PersonComponent is decoupled from PlanetComponent. It only knows that it needs to pass a planet object to it as a prop.
-* If PlanetComponent requirements change and it needs more planet data to render, no changes are required to the components that consume it.
+* If the requirements change for PlanetComponent and it needs more planet data to render, no changes are required to the components that consume it.
 
 ---
+# How is data masking implemented?
+
+* There's a two step process to render GraphQL data
+* Step 1 - The network response is "flattened" into a store
+* Step 2 - Data to be rendered is "selected" out of the store
+
+???
 # How is data masking implemented?
 
 * There's a two step process to render GraphQL data
@@ -402,10 +419,14 @@ export default createFragmentContainer(PersonComponent, {
 ---
 # Selecting data out of the store
 
-* A selector can be created from both
-* * The GraphQL fragment
-* * A reference to the right object
+* A selector can be created from
+* * An ID reference to an object
+* * A GraphQL fragment
 
+???
+* A selector can be created from
+* * An ID reference to an object
+* * A GraphQL fragment
 
 ---
 # Selecting data out of the store
@@ -482,11 +503,11 @@ fragment on Person {
 ]
 ]
 ???
-* From this flattened store object, an ID reference, and the fragment, you could create a function that returns the correct data for a component.
-* Only the correct fields will be returned even if additional data will be fetched. 
+* Using a flattened store object, an ID reference, and the fragment, you could create a function that returns the correct data for a component.
+* Only the correct fields will be returned even if additional data was be fetched. 
 * This is what `createFragmentContainer` does internally.
 * It's implemented by getting the selected fields from the AST of the graphql fragment, and a recursive function that can follow the references in the store.
-* If you've used react-redux, it's a lot like the connect function, except here it can be buit automatically by the fragment data.
+* If you've used react-redux, it's a lot like the `connect` function, except here it can be buit automatically by the fragment data.
 ---
 # Selecting data out of the store
 
@@ -528,7 +549,7 @@ export default createFragmentContainer(PersonComponent, {
 ]
 
 ???
-* At the top of this slide is a very simple implementation of createFragmentContainer
+* At the top of this slide is a simplified implementation of createFragmentContainer
 * * For each fragment passed to `createFragmentContainer` we check for a prop with the same name passed in and select the correct data out of the store.
 * * The selected data is passed to the component, overriding the props from the parent.
 * At the bottom is how a fragment container is defined
@@ -537,16 +558,27 @@ export default createFragmentContainer(PersonComponent, {
 ---
 # Why data masking?
 * Why is this good? It prevents implicit data dependencies
-* If this field is no longer used in this component you can have complete confidence that it can be removed from the query without understanding the whole codebase.
+* Confidence to remove unused fields.
 * Helps you ensure you are not over fetching.
 * Especially useful when you have a team working on the same codebase.
 
 ???
-* I think this is an underrated feature of Relay
+* Why data masking? What's the point?
+* It prevents implicit data dependencies
+* Let's say you're refactoring a component and it no longer needs a field from your GraphQL server. You have complete confidence that it can be safely removed from the fragment without understanding the whole codebase.
+* Helps you ensure you are not over fetching.
+* * If you can't be sure if something is used, you're going to leave it there.
+* Especially useful when you have a team working on the same codebase.
 
 ---
-class: center, middle
 # That's all!
+* twitter @rob_richard
+* github @robrichard
+
+???
+* That's all I have, thanks for listening.
+* Be sure to find me during the breaks if you want to chat more about this.
+* Thanks!
 
 
     </textarea>
