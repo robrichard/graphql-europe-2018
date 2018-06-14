@@ -160,6 +160,12 @@ class: center, middle
 ???
 
 * Hi! My name is Rob and I'm a Director of Front-End Engineering @ 1stdibs.
+
+---
+
+<image style="width:100%" src="./1stdibs.png"/>
+
+???
 * 1stdibs is an online marketplace for rare and desireable goods. In other words...really expensive stuff.
 * Our front-end team is all-in on JavaScript. Our stack is Node, GraphQL, React, Relay.
 
@@ -507,7 +513,7 @@ fragment on Person {
 * Only the correct fields will be returned even if additional data was be fetched. 
 * This is what `createFragmentContainer` does internally.
 * It's implemented by getting the selected fields from the graphql fragment, and a recursive function that can follow the references in the store.
-* If you've used react-redux, it's a lot like the `connect` function. In redux you would write a function that would return the needed properties from your store. In Relay this can be generated automatically by the fragment data.
+* If you've used react-redux, it's a lot like the `connect` function. In redux you would write a function that would return the needed properties from your store. In Relay this can be generated automatically from the fragment data.
 ---
 # Selecting data out of the store
 
@@ -560,7 +566,7 @@ export default createFragmentContainer(PersonComponent, {
 * Why is this good? It prevents implicit data dependencies
 * Confidence to remove unused fields.
 * Helps you ensure you are not over fetching.
-* Especially useful when you have a team working on the same codebase.
+* Especially useful when you have a team working on a large codebase.
 
 ???
 * Why data masking? What's the point?
