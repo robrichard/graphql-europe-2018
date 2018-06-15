@@ -159,15 +159,16 @@ class: center, middle
 
 ???
 
-* Hi! My name is Rob and I'm a Director of Front-End Engineering @ 1stdibs.
+* Hi! My name is Rob and I'm a Front-End Engineering @ 1stdibs.
 
 ---
 
 <image style="width:100%" src="./1stdibs.png"/>
 
 ???
-* 1stdibs is an online marketplace for rare and desireable goods. In other words...really expensive stuff.
-* Our front-end team is all-in on JavaScript. Our stack is Node, GraphQL, React, & Relay.
+* 1stdibs is an online marketplace for rare and desireable goods. We sell Vintage and Antique Furniture, Jewelry, Fashion, and Art.
+* Our front-end team is all-in on JavaScript. 
+* Our stack is Node, GraphQL, React, & Relay.
 
 ---
 
@@ -260,7 +261,7 @@ export default createFragmentContainer(PersonComponent, {
 * Up next we have `createFragmentContainer`.
 * `createFragmentContainer` is a function that creates a higher order component.
 * These components are used as children of a QueryRenderer
-* It provides a way to couple a GraphQL fragment to a component.
+* It provides a way to directly couple a GraphQL fragment to a component.
 * This allows the component to define it's data depedency via the fragment 
 
 ---
@@ -305,16 +306,18 @@ const MyComponent => (
 * * It's a declarative way to describe the data you need
 * It also allows components to be more reusable
 * * You can drop the component you need into other places of your app without adjusting your data fetching
-* * All you need to use this component is a reference to a Person object. This component could render a `Person` type in multiple different contexts.
+* * If you have a component that renders a `Person` object, you can use this component anywhere you wanted to render this type. All you would need is to pass it a reference to a Person object. 
 * `createFragmentContainer` also enables data masking
 
 ---
 # What is data masking?
 
 * Data masking prevents components from accessing data they did not specifically request
+* Prevents implicit dependencies
 
 ???
 * Data masking prevents components from accessing data they did not specifically request
+* In other words, it prevents implicit dependencies
 * Let's look at an example
 
 ---
