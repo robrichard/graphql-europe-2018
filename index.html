@@ -526,7 +526,7 @@ fragment on Person {
 .codeBorder[
 ### react-redux
 ```js
-// create HOC
+// create Higher Order Component
 export default connect((state, props) => {
   const person = state.person[props.personId];
   return {
@@ -541,7 +541,7 @@ export default connect((state, props) => {
 .codeBorder.marginTop[
 ### react-relay
 ```js
-// create HOC
+// create Higher Order Component
 export default createFragmentContainer(PersonComponent, {
   person: graphql`
     fragment PersonComponent_person on Person {
