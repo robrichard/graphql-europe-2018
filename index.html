@@ -195,6 +195,7 @@ const MyComponent => (
       query MyComponentQuery($personId: ID!) {
         person(id: $personId) {
           id
+          name
           height
           homeworld {
             id
@@ -247,6 +248,7 @@ export default createFragmentContainer(PersonComponent, {
   person: graphql`
     fragment PersonComponent_person on Person {
       id
+      name
       height
       homeworld {
         id
