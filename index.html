@@ -264,7 +264,7 @@ export default createFragmentContainer(PersonComponent, {
 * `createFragmentContainer` is a function that creates a higher order component.
 * These components are used as children of a QueryRenderer
 * It provides a way to directly couple a GraphQL fragment to a component.
-* This allows the component to define it's data depedency via the fragment 
+* This allows the component to define it's data dependency via the fragment 
 
 ---
 # Updated `<QueryRenderer/>`
@@ -594,7 +594,7 @@ function createFragmentContainer(Component, fragments) {
 
 ???
 * Why data masking? What's the point?
-* It prevents implicit data dependencies
+* Makes implicit data dependencies impossible
 * Let's say you're refactoring a component and it no longer needs a field from your GraphQL server. You have complete confidence that it can be safely removed from the fragment without understanding the whole codebase.
 * * This confidence is important. If you're not confident that removing something won't break anything, chances are you'll leave it in. If this happens a few times you could be accidentally overfetching and your app will not be as performant as it could be.
 * This is definitely something that's useful when it's a team of engineers working on a large codebase.
