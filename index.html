@@ -516,7 +516,7 @@ fragment on Person {
 ]
 ???
 * Using a flattened store object, an ID reference, and the fragment, you could create a function that returns the correct data for a component.
-* Only the correct fields will be returned even if additional data was be fetched. 
+* Only the correct fields will be returned even if additional data was fetched. 
 * This is what `createFragmentContainer` does internally.
 * It's implemented by getting the selected fields from the graphql fragment, and a recursive function that can follow the references in the store.
 ---
