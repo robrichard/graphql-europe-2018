@@ -338,6 +338,7 @@ export default createFragmentContainer(PersonComponent, {
     fragment PersonComponent_person on Person {
       id
       height
+      name
       homeworld {
 +       ...PlanetComponent
       }
@@ -513,7 +514,44 @@ fragment on Person {
 * Only the correct fields will be returned even if additional data was be fetched. 
 * This is what `createFragmentContainer` does internally.
 * It's implemented by getting the selected fields from the graphql fragment, and a recursive function that can follow the references in the store.
+---
+
+# Selecting data out of the store
+
+.codeBorder[
+### react-redux
+```js
+// create HOC
+export default connect((state, props) => {
+  const person = state.person[props.personId];
+  return {
+    id: person.id,
+    height: person.height,
+    name: person.name,
+  };
+})(PersonComponent)
+```
+]
+
+.codeBorder.marginTop[
+### react-relay
+```js
+// create HOC
+export default createFragmentContainer(PersonComponent, {
+  person: graphql`
+    fragment PersonComponent_person on Person {
+      id
+      height
+      name
+    }
+  `
+});
+```
+]
+
+???
 * If you've used react-redux, it's a lot like the `connect` function. In redux you would write a function that would return the needed properties from your store. In Relay this can be generated automatically from the fragment data.
+
 ---
 # Selecting data out of the store
 
@@ -536,30 +574,11 @@ function createFragmentContainer(Component, fragments) {
 ```
 ]
 
-.codeBorder.smallCode.marginTop[
-### Usage
-```js
-// create HOC
-export default createFragmentContainer(PersonComponent, {
-  person: graphql`
-    fragment PersonComponent_person on Person {
-      id
-      height
-    }
-  `
-});
-
-// render HOC
-<PersonComponent person={props.person} />
-```
-]
 
 ???
-* At the top of this slide is a simplified implementation of createFragmentContainer
+* Here is a simplified implementation of createFragmentContainer
 * * For each fragment passed to `createFragmentContainer` we check for a prop with the same name passed in and select the correct data out of the store.
 * * The selected data is passed to the component, overriding the props from the parent.
-* At the bottom is how a fragment container is defined
-* Then how its used in the consuming component
 
 ---
 # Why data masking?
@@ -573,10 +592,11 @@ export default createFragmentContainer(PersonComponent, {
 * It prevents implicit data dependencies
 * Let's say you're refactoring a component and it no longer needs a field from your GraphQL server. You have complete confidence that it can be safely removed from the fragment without understanding the whole codebase.
 * * This confidence is important. If you're not confident that removing something won't break anything, chances are you'll leave it in. If this happens a few times you could be accidentally overfetching and your app will not be as performant as it could be.
-* This is especially useful when it's a team of engineers working on a large codebase.
+* This is definitely something that's useful when it's a team of engineers working on a large codebase.
 
 ---
 # That's all!
+* https://www.1stdibs.com
 * twitter @rob_richard
 * github @robrichard
 
