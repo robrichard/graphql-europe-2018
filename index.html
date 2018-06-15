@@ -596,19 +596,21 @@ function createFragmentContainer(Component, fragments) {
 * Why data masking? What's the point?
 * Makes implicit data dependencies impossible
 * Let's say you're refactoring a component and it no longer needs a field from your GraphQL server. You have complete confidence that it can be safely removed from the fragment without understanding the whole codebase.
-* * This confidence is important. If you're not confident that removing something won't break anything, chances are you'll leave it in. If this happens a few times you could be accidentally overfetching and your app will not be as performant as it could be.
-* This is definitely something that's useful when it's a team of engineers working on a large codebase.
+* * This confidence is important. If you're not confident that removing something won't break anything, chances are you'll leave it around. 
+* * If this happens a few times you could be accidentally overfetching and your app will not be as performant as it could be.
+* This is definitely something that's useful when it's a team of engineers working on a larger codebase. You're most likely to run into these types of issues as different people are working on the same files.
+* Lastly, everything is a trade-off. You should choose your GraphQL client depending on your team's needs.
+* Maybe that is something that's easy to get started with or it's something that provides more constraints to bigger teams.
 
 ---
 # That's all!
 * https://www.1stdibs.com
-* twitter @rob_richard
-* github @robrichard
+* twitter: @rob_richard
+* github: @robrichard
 
 ???
-* That's all I have.
-* Be sure to find me during the breaks if you want to chat more about this.
-* Thanks for listening!
+* That's all!
+* Thank you so much!
 
 
     </textarea>
